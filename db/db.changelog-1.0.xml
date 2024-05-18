@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+    <changeSet author="exchange-rate-service" id="changelog-1.0">
+        <sql>
+            CREATE TABLE IF NOT EXISTS subscriptions
+                (
+                    id uuid NOT NULL,
+                    email varchar(255) NOT NULL,
+                    CONSTRAINT access_management_pkey PRIMARY KEY (id)
+                )
+        </sql>
+
+        <createIndex indexName="idx_subscription_email" tableName="subscriptions">
+            <column name="email"/>
+        </createIndex>
+
+        <rollback>
+            <dropIndex tableName="subscriptions" indexName="idx_subscription_email" />
+            <dropTable tableName="subscriptions" />
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
