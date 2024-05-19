@@ -5,16 +5,21 @@ import (
 	"io"
 	"net/http"
 
+	exchange_rate "exchange-rate-service/internal/services/exchange-rate"
 	"exchange-rate-service/internal/store/subscriptions"
 	"github.com/pkg/errors"
 )
 
 type Handler struct {
-	subscriptionsStore subscriptions.Store
+	subscriptionsStore  subscriptions.Store
+	exchangeRateService exchange_rate.ExchangeRateService
 }
 
-func NewHandler(subscriptionsStore subscriptions.Store) *Handler {
-	return &Handler{subscriptionsStore: subscriptionsStore}
+func NewHandler(subscriptionsStore subscriptions.Store, erService exchange_rate.ExchangeRateService) *Handler {
+	return &Handler{
+		subscriptionsStore:  subscriptionsStore,
+		exchangeRateService: erService,
+	}
 }
 
 func (h *Handler) CreateSubscription(resp http.ResponseWriter, req *http.Request) {
@@ -61,4 +66,19 @@ func (h *Handler) CreateSubscription(resp http.ResponseWriter, req *http.Request
 	}
 
 	WriteResponse[any](resp, nil, http.StatusCreated)
+}
+
+func (h *Handler) GetRate(resp http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+	res, err := h.exchangeRateService.GetRate(ctx, exchange_rate.UAHCode, exchange_rate.USDCode)
+	if err != nil {
+		WriteErrorResponse(resp, NewErrorResponse(ExchangeServiceInternalError, ExchangeServiceError), http.StatusInternalServerError)
+		return
+	}
+	if res == nil {
+		WriteErrorResponse(resp, NewErrorResponse(CurrencyRateNotFoundError, CurrencyRateError), http.StatusInternalServerError)
+		return
+	}
+
+	WriteResponse[*RateResponse](resp, &RateResponse{RateBuy: res.RateBuy, RateSell: res.RateSell}, http.StatusOK)
 }

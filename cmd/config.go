@@ -12,11 +12,13 @@ const (
 	databaseConnRetriesEnv       = "DATABASE_CONNECTION_RETRIES"
 	databaseRetryWaitDurationEnv = "DATABASE_RETRY_WAIT_DURATION"
 	httpPortEnv                  = "HTTP_PORT"
+	monobankBaseURLEnv           = "MONOBANK_BASE_URL"
 )
 
 const (
 	dbConnRetriesDefault       = 10
 	dbRetryWaitDurationDefault = 2 * time.Second
+	monobankBaseURLDefault     = "https://api.monobank.ua"
 )
 
 type databaseConfig struct {
@@ -27,13 +29,15 @@ type databaseConfig struct {
 }
 
 type Config struct {
-	Database databaseConfig
-	HTTPPort int
+	Database        databaseConfig
+	HTTPPort        int
+	MonobankBaseURL string
 }
 
 func LoadConfig() *Config {
 	viper.SetDefault(databaseConnRetriesEnv, dbConnRetriesDefault)
 	viper.SetDefault(databaseRetryWaitDurationEnv, dbRetryWaitDurationDefault)
+	viper.SetDefault(monobankBaseURLEnv, monobankBaseURLDefault)
 
 	viper.AutomaticEnv()
 
@@ -44,6 +48,7 @@ func LoadConfig() *Config {
 			ConnRetries:       viper.GetInt(databaseConnRetriesEnv),
 			RetryWaitDuration: viper.GetDuration(databaseRetryWaitDurationEnv),
 		},
-		HTTPPort: viper.GetInt(httpPortEnv),
+		HTTPPort:        viper.GetInt(httpPortEnv),
+		MonobankBaseURL: viper.GetString(monobankBaseURLEnv),
 	}
 }

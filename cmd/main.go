@@ -10,7 +10,9 @@ import (
 	"time"
 
 	"exchange-rate-service/internal/api"
+	exchange_rate "exchange-rate-service/internal/services/exchange-rate"
 	"exchange-rate-service/internal/store/subscriptions"
+	"exchange-rate-service/pkg/httpclient"
 	"exchange-rate-service/pkg/store/pg"
 	"github.com/rs/zerolog/log"
 )
@@ -28,11 +30,14 @@ func main() {
 
 	subscriptionsStore := subscriptions.NewPostgresStore(db)
 	log.Ctx(ctx).Info().Msg("successfully connected to subscriptions store")
+	restClient := httpclient.NewHTTPClient(http.DefaultClient)
+	monobankExchangeService := exchange_rate.NewMonobankExchangeRateService(restClient, config.MonobankBaseURL)
+	log.Ctx(ctx).Info().Msg("successfully created monobank exchange service")
 
 	errChan := make(chan error)
 	// Run HTTP API handler
 	go func() {
-		handler := api.NewHandler(subscriptionsStore)
+		handler := api.NewHandler(subscriptionsStore, monobankExchangeService)
 		server := &http.Server{
 			Addr:              fmt.Sprintf(":%d", config.HTTPPort),
 			Handler:           api.NewRouter(handler),

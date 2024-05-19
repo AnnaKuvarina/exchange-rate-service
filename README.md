@@ -3,6 +3,10 @@ This is a service with APIs that will allow you to:
 - find out the current dollar (USD) to hryvnia (UAH) exchange rate;
 - sign an email to receive information on exchange rate changes.
 
+Undone task:  
+- send email with the currency rate to subscribed emails;
+- validation for email format.  
+
 ## Folder structure
 /api - holds the swagger file
 /cmd - contains main.go file and config file

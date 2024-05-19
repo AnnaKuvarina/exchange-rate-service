@@ -14,15 +14,19 @@ const (
 	StoreError
 	AlreadyExistsError
 	InvalidEmailError
+	ExchangeServiceError
+	CurrencyRateError
 )
 
 type ErrorMessage string
 
 const (
-	InvalidRequestError       ErrorMessage = "invalid request"
-	InvalidEmailFormatError   ErrorMessage = "invalid email"
-	InternalError             ErrorMessage = "internal error"
-	SubscriptionAlreadyExists ErrorMessage = "subscription with provided email already exists"
+	InvalidRequestError          ErrorMessage = "invalid request"
+	InvalidEmailFormatError      ErrorMessage = "invalid email"
+	InternalError                ErrorMessage = "internal error"
+	SubscriptionAlreadyExists    ErrorMessage = "subscription with provided email already exists"
+	ExchangeServiceInternalError ErrorMessage = "internal error: enable to get currency rate"
+	CurrencyRateNotFoundError    ErrorMessage = "enable to fund the currency exchange rate"
 )
 
 type ErrorResponse struct {
